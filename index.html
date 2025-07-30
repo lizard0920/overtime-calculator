@@ -2,7 +2,7 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8" />
-  <title>加班時間雙向計算器</title>
+  <title>加班時間計算機</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -69,7 +69,7 @@
       <option value="平日">平日</option>
       <option value="假日">假日</option>
     </select>
-    <label for="shift2">班別（四碼，例如 0900）：</label>
+    <label for="shift2">班別（=規定上班時間，四碼，例如 0900）：</label>
     <input type="text" id="shift2" placeholder="0900" maxlength="4" pattern="\d{4}" />
     <label for="endTime">下班時間（四碼，例如 2000）：</label>
     <input type="text" id="endTime" placeholder="2000" maxlength="4" pattern="\d{4}" />
@@ -84,7 +84,7 @@
       <option value="平日">平日</option>
       <option value="假日">假日</option>
     </select>
-    <label for="shift">班別（四碼，例如 0900）：</label>
+    <label for="shift">班別（=規定上班時間，四碼，例如 0900）：</label>
     <input type="text" id="shift" placeholder="0900" maxlength="4" pattern="\d{4}" />
     <label for="otHours">加班時間（小時）：</label>
     <input type="number" id="otHours" placeholder="2" min="0" step="0.1" />
