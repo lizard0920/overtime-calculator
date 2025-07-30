@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <title>加班時間雙向計算器</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      gap: 40px;
+      padding: 20px;
+      flex-wrap: wrap;
+    }
+    .container {
+      border: 1px solid #ccc;
+      padding: 20px;
+      width: 400px;
+      border-radius: 8px;
+      box-sizing: border-box;
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+    }
+    input, select {
+      width: 100%;
+      padding: 6px;
+      margin-top: 4px;
+      box-sizing: border-box;
+    }
+    button {
+      margin-top: 15px;
+      padding: 8px 12px;
+      cursor: pointer;
+    }
+    h2 {
+      margin-top: 0;
+      font-size: 1.2em;
+      color: #333;
+    }
+    #result, #result2 {
+      font-weight: bold;
+      margin-top: 10px;
+      font-size: 1.1em;
+      color: #0055aa;
+    }
+    @media (max-width: 600px) {
+      body {
+        flex-direction: column;
+        padding: 10px;
+      }
+      .container {
+        width: 100%;
+        margin-bottom: 20px;
+      }
+      input, select {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>我知道下班時間，我要知道加班時數？</h2>
+    <label for="dayType2">加班日別（平日／假日）：</label>
+    <select id="dayType2">
+      <option value="">請選擇</option>
+      <option value="平日">平日</option>
+      <option value="假日">假日</option>
+    </select>
+    <label for="shift2">班別（四碼，例如 0900）：</label>
+    <input type="text" id="shift2" placeholder="0900" maxlength="4" pattern="\d{4}" />
+    <label for="endTime">下班時間（四碼，例如 2000）：</label>
+    <input type="text" id="endTime" placeholder="2000" maxlength="4" pattern="\d{4}" />
+    <button id="calcOvertimeBtn">計算加班時數</button>
+    <div id="result2"></div>
+  </div>
+  <div class="container">
+    <h2>我知道上班時間，我要知道下班時間？</h2>
+    <label for="dayType">加班日別（平日／假日）：</label>
+    <select id="dayType">
+      <option value="">請選擇</option>
+      <option value="平日">平日</option>
+      <option value="假日">假日</option>
+    </select>
+    <label for="shift">班別（四碼，例如 0900）：</label>
+    <input type="text" id="shift" placeholder="0900" maxlength="4" pattern="\d{4}" />
+    <label for="otHours">加班時間（小時）：</label>
+    <input type="number" id="otHours" placeholder="2" min="0" step="0.1" />
+    <button id="calcEndTimeBtn">計算下班時間</button>
+    <div id="result"></div>
+  </div>
+
+  <script>
+    function toDecimalHours(timeStr) {
+      if (!/^\d{4}$/.test(timeStr)) return null;
+      const h = parseInt(timeStr.slice(0, 2), 10);
+      const m = parseInt(timeStr.slice(2), 10);
+      if (h > 23 || m > 59) return null;
+      return h + m / 60;
+    }
+
+    function formatHHMM(decimalHours) {
+      decimalHours = decimalHours % 24;
+      const h = Math.floor(decimalHours);
+      const m = Math.round((decimalHours - h) * 60);
+      return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
+    }
+
+    function calculateOvertime() {
+      const dayType = document.getElementById("dayType2").value;
+      const shiftStr = document.getElementById("shift2").value;
+      const endStr = document.getElementById("endTime").value;
+      const resultEl = document.getElementById("result2");
+
+      if (!dayType || !shiftStr || !endStr) {
+        resultEl.textContent = "請完整填寫所有欄位";
+        return;
+      }
+
+      const startDec = toDecimalHours(shiftStr);
+      const endDec = toDecimalHours(endStr);
+
+      if (startDec === null || endDec === null) {
+        resultEl.textContent = "班別或下班時間格式錯誤";
+        return;
+      }
+
+      let workHours = (endDec - startDec + 24) % 24;
+      let ot = 0;
+
+      if (dayType === "平日") {
+        ot = Math.max(workHours - 9.5, 0);
+      } else if (dayType === "假日") {
+        if (workHours <= 4) {
+          ot = workHours;
+        } else if (workHours <= 8) {
+          ot = workHours - 1;
+        } else {
+          ot = workHours - 1.5;
+        }
+        if (ot < 0) ot = 0;
+      }
+
+      resultEl.textContent = `加班時數為：${ot.toFixed(2)} 小時`;
+    }
+
+    function calculateEndTime() {
+      const dayType = document.getElementById("dayType").value;
+      const shiftStr = document.getElementById("shift").value;
+      const otHours = parseFloat(document.getElementById("otHours").value);
+      const resultEl = document.getElementById("result");
+
+      if (!dayType || !shiftStr) {
+        resultEl.textContent = "";
+        return;
+      }
+
+      if (isNaN(otHours)) {
+        resultEl.textContent = "加班時數請輸入數字";
+        return;
+      }
+
+      const startDec = toDecimalHours(shiftStr);
+      if (startDec === null) {
+        resultEl.textContent = "班別格式錯誤";
+        return;
+      }
+
+      let endDec = 0;
+
+      if (dayType === "平日") {
+        if (!otHours || otHours === 0) {
+          endDec = startDec + 9;
+        } else {
+          endDec = startDec + 9.5 + otHours;
+        }
+      } else if (dayType === "假日") {
+        if (!otHours || otHours === 0) {
+          resultEl.textContent = "假日加班時數不可為空";
+          return;
+        }
+        if (otHours <= 4) {
+          endDec = startDec + otHours;
+        } else if (otHours <= 8) {
+          endDec = startDec + 1 + otHours;
+        } else {
+          endDec = startDec + 1.5 + otHours;
+        }
+      }
+
+      endDec = endDec % 24;
+
+      resultEl.textContent = `應填下班時間：${formatHHMM(endDec)}`;
+    }
+
+    document.getElementById("calcOvertimeBtn").addEventListener("click", calculateOvertime);
+    document.getElementById("calcEndTimeBtn").addEventListener("click", calculateEndTime);
+  </script>
+</body>
+</html>
