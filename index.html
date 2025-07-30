@@ -7,9 +7,10 @@
     body {
       font-family: Arial, sans-serif;
       display: flex;
+      flex-direction: column; /* 改成上下排列 */
       gap: 40px;
       padding: 20px;
-      flex-wrap: wrap;
+      flex-wrap: nowrap;
     }
     .container {
       border: 1px solid #ccc;
@@ -17,6 +18,7 @@
       width: 400px;
       border-radius: 8px;
       box-sizing: border-box;
+      margin: 0 auto; /* 置中 */
     }
     label {
       display: block;
@@ -46,7 +48,6 @@
     }
     @media (max-width: 600px) {
       body {
-        flex-direction: column;
         padding: 10px;
       }
       .container {
