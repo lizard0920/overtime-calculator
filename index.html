@@ -7,7 +7,7 @@
     body {
       font-family: Arial, sans-serif;
       display: flex;
-      flex-direction: column; /* 改成上下排列 */
+      flex-direction: column;
       gap: 40px;
       padding: 20px;
       flex-wrap: nowrap;
@@ -18,7 +18,7 @@
       width: 400px;
       border-radius: 8px;
       box-sizing: border-box;
-      margin: 0 auto; /* 置中 */
+      margin: 0 auto;
     }
     label {
       display: block;
@@ -46,6 +46,10 @@
       font-size: 1.1em;
       color: #0055aa;
     }
+    .highlight {
+      color: red;
+      font-weight: bold;
+    }
     @media (max-width: 600px) {
       body {
         padding: 10px;
@@ -62,22 +66,7 @@
 </head>
 <body>
   <div class="container">
-    <h2>我知道下班時間，我要知道加班時數？</h2>
-    <label for="dayType2">加班日別（平日／假日）：</label>
-    <select id="dayType2">
-      <option value="">請選擇</option>
-      <option value="平日">平日</option>
-      <option value="假日">假日</option>
-    </select>
-    <label for="shift2">班別（=規定上班時間，四碼，例如 0900）：</label>
-    <input type="text" id="shift2" placeholder="0900" maxlength="4" pattern="\d{4}" />
-    <label for="endTime">下班時間（四碼，例如 2000）：</label>
-    <input type="text" id="endTime" placeholder="2000" maxlength="4" pattern="\d{4}" />
-    <button id="calcOvertimeBtn">計算加班時數</button>
-    <div id="result2"></div>
-  </div>
-  <div class="container">
-    <h2>我知道加班時數，我要知道下班時間？</h2>
+    <h2>我知道 <span>加班時數</span>，我要知道<span class="highlight">下班時間</span>？</h2>
     <label for="dayType">加班日別（平日／假日）：</label>
     <select id="dayType">
       <option value="">請選擇</option>
@@ -90,6 +79,22 @@
     <input type="number" id="otHours" placeholder="2" min="0" step="0.1" />
     <button id="calcEndTimeBtn">計算下班時間</button>
     <div id="result"></div>
+  </div>
+
+  <div class="container">
+    <h2>我知道 <span>下班時間</span>，我要知道<span class="highlight">加班時數</span>？</h2>
+    <label for="dayType2">加班日別（平日／假日）：</label>
+    <select id="dayType2">
+      <option value="">請選擇</option>
+      <option value="平日">平日</option>
+      <option value="假日">假日</option>
+    </select>
+    <label for="shift2">班別（=規定上班時間，四碼，例如 0900）：</label>
+    <input type="text" id="shift2" placeholder="0900" maxlength="4" pattern="\d{4}" />
+    <label for="endTime">下班時間（四碼，例如 2000）：</label>
+    <input type="text" id="endTime" placeholder="2000" maxlength="4" pattern="\d{4}" />
+    <button id="calcOvertimeBtn">計算加班時數</button>
+    <div id="result2"></div>
   </div>
 
   <script>
