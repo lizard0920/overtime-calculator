@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>請假時數計算器</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background-color: #f9f9f9;
+    }
+    .container {
+      max-width: 500px;
+      margin: auto;
+      padding: 20px;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+    }
+    input, button {
+      width: 100%;
+      padding: 8px;
+      margin-top: 4px;
+      box-sizing: border-box;
+    }
+    button {
+      margin-top: 20px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    .result {
+      margin-top: 20px;
+      font-size: 1.1em;
+    }
+    .label {
+      font-weight: bold;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>請假計算</h2>
+    <label for="leaveStart">請假起：</label>
+    <input type="time" id="leaveStart" />
+
+    <label for="leaveEnd">請假迄：</label>
+    <input type="time" id="leaveEnd" />
+
+    <button onclick="calculateLeave()">計算</button>
+
+    <div class="result">
+      <div class="label">請假時數：</div>
+      <div id="leaveHour"></div>
+
+      <div class="label">應請假時間：</div>
+      <div id="leaveRange"></div>
+
+      <div class="label">應打卡時間：</div>
+      <div id="leavePunch"></div>
+    </div>
+  </div>
+
+  <script>
+    function parseTimeToDecimal(timeStr) {
+      const [hour, minute] = timeStr.split(":").map(Number);
+      return hour + minute / 60;
+    }
+
+    function formatDecimalToHHMM(decimal) {
+      const hour = Math.floor(decimal);
+      const minute = Math.round((decimal - hour) * 60);
+      return `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`;
+    }
+
+    function calculateLeave() {
+      const start = document.getElementById("leaveStart").value;
+      const end = document.getElementById("leaveEnd").value;
+      const leaveHourEl = document.getElementById("leaveHour");
+      const leaveRangeEl = document.getElementById("leaveRange");
+      const leavePunchEl = document.getElementById("leavePunch");
+
+      if (!start || !end) {
+        leaveHourEl.textContent = "請填寫請假起訖時間";
+        leaveRangeEl.textContent = "";
+        leavePunchEl.textContent = "";
+        return;
+      }
+
+      const startDec = parseTimeToDecimal(start);
+      const endDec = parseTimeToDecimal(end);
+
+      let breakDeduct = 0;
+      if (startDec < 13 && endDec > 13) {
+        breakDeduct = 1;
+      } else if (end === "12:30") {
+        breakDeduct = 0.5;
+      }
+
+      let leaveHours = endDec - startDec - breakDeduct;
+      if (leaveHours < 0) leaveHours = 0;
+
+      // Leave Range
+      let leaveRangeText = `${start} - ${end}`;
+      if (start === "09:00" && (end === "12:30" || end === "13:00")) {
+        leaveRangeText = "09:00 - 12:00";
+      }
+
+      // Punch Time
+      let punchText = "";
+      if (start !== "09:00" || end !== "18:00") {
+        punchText = "09:00 - 18:00";
+      }
+
+      if (start === "09:00" && end === "18:00") {
+        punchText = "";
+      } else if (start >= "09:00" && end <= "12:00") {
+        punchText = `${end}`;
+      } else if (start >= "09:00" && (end === "12:30" || end === "13:00")) {
+        punchText = "12:00";
+      } else if (start >= "09:00" && end === "13:30") {
+        punchText = "12:30";
+      } else if (start >= "09:00") {
+        punchText = "09:00";
+      }
+
+      // For range formatting
+      if (punchText.includes(":") && !punchText.includes(" - ")) {
+        punchText = `09:00 - ${punchText}`;
+      }
+
+      // Output
+      leaveHourEl.textContent = leaveHours.toFixed(2) + " 小時";
+      leaveRangeEl.textContent = leaveRangeText;
+      leavePunchEl.textContent = punchText;
+    }
+  </script>
+</body>
+</html>
